@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  streambot:
+    build: .
+    container_name: streambot
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
