@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{{ file.file_name }} — Download</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#06060c;--panel:#0e0e16;--card:#14141e;--rim:rgba(255,255,255,.07);--v:#7c3aed;--vl:#a78bfa;--g:#10b981;--ink:#e8e8f4;--dim:#7070a0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 16px 48px;}
+body::before{content:'';position:fixed;top:-20vh;left:50%;transform:translateX(-50%);width:60vw;height:50vh;background:radial-gradient(ellipse,rgba(16,185,129,.1) 0%,transparent 70%);pointer-events:none;}
+header{width:100%;max-width:460px;display:flex;align-items:center;justify-content:space-between;padding:16px 0 14px;position:relative;z-index:1;}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);}
+.logo-sq{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,var(--v),var(--vl));display:grid;place-items:center;font-size:13px;box-shadow:0 0 12px rgba(167,139,250,.35);}
+.logo-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;}
+main{width:100%;max-width:460px;position:relative;z-index:1;}
+.card{background:var(--card);border:1px solid var(--rim);border-radius:14px;overflow:hidden;box-shadow:0 28px 72px rgba(0,0,0,.7);}
+.card-art{aspect-ratio:16/5;background:linear-gradient(135deg,#0a0820,#1a0835,#060c20);display:flex;align-items:center;justify-content:center;font-size:60px;opacity:.45;}
+.body{padding:22px;}
+.fname{font-size:16px;font-weight:700;margin-bottom:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.cell{background:var(--panel);border:1px solid var(--rim);border-radius:8px;padding:9px 12px;}
+.cell .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px;}
+.cell .v{font-size:12px;font-weight:500;}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 18px;border-radius:9px;font-size:13px;font-weight:600;font-family:'Space Grotesk',sans-serif;text-decoration:none;cursor:pointer;border:none;transition:all .18s;width:100%;margin-bottom:8px;}
+.btn-g{background:linear-gradient(135deg,#059669,var(--g));color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.28);}
+.btn-g:hover{opacity:.88;transform:translateY(-1px);}
+.btn-ghost{background:var(--panel);color:var(--dim);border:1px solid var(--rim);}
+.btn-ghost:hover{border-color:var(--vl);color:var(--vl);}
+.lock-note{display:flex;align-items:center;gap:7px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:8px;padding:9px 12px;font-size:11px;color:#6ee7b7;margin-top:2px;}
+footer{margin-top:28px;text-align:center;font-size:11px;color:var(--dim);line-height:1.8;position:relative;z-index:1;}
+footer a{color:var(--vl);text-decoration:none;}
+.flinks{display:flex;gap:14px;justify-content:center;margin-bottom:4px;}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/"><div class="logo-sq">▶</div><span class="logo-name">𝙵𝚒𝚕𝚎𝚃𝚘𝙻𝚒𝚗𝚔𝚅𝟹</span></a>
+</header>
+<main>
+  <div class="card">
+    <div class="card-art">📁</div>
+    <div class="body">
+      <div class="fname" title="{{ file.file_name }}">{{ file.file_name }}</div>
+      <div class="grid">
+        <div class="cell"><div class="l">Size</div><div class="v">{{ file_size }}</div></div>
+        <div class="cell"><div class="l">Type</div><div class="v">{{ (file.mime_type or 'File').split('/')[-1] | upper }}</div></div>
+        <div class="cell"><div class="l">Uploaded</div><div class="v">{{ file.uploaded_at[:10] }}</div></div>
+        <div class="cell"><div class="l">Status</div><div class="v" style="color:#6ee7b7;">✅ Ready</div></div>
+      </div>
+      <a class="btn btn-g" href="/dl/{{ file.file_hash }}/{{ file.dl_token }}" download="{{ file.file_name }}">⬇️ Download File</a>
+      <a class="btn btn-ghost" href="{{ updates }}" target="_blank">📢 Join Updates Channel</a>
+      <div class="lock-note">🔒 Private link — do not share. Only you can download this.</div>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="flinks">
+    <a href="{{ updates }}" target="_blank">📢 Updates</a>
+    <a href="{{ support }}" target="_blank">💬 Support</a>
+    <a href="{{ dev }}"     target="_blank">👨‍💻 Dev</a>
+  </div>
+  Powered by <strong>𝙵𝚒𝚕𝚎𝚃𝚘𝙻𝚒𝚗𝚔𝚅𝟹</strong>
+</footer>
+</body>
+</html>

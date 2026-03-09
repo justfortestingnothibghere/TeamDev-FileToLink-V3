@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FileToLinkV3 — Telegram File Streamer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#06060c;--panel:#0e0e16;--card:#14141e;--rim:rgba(255,255,255,.07);--v:#7c3aed;--vl:#a78bfa;--ink:#e8e8f4;--dim:#7070a0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:-30vh;left:50%;transform:translateX(-50%);width:90vw;height:60vh;background:radial-gradient(ellipse,rgba(124,58,237,.16) 0%,transparent 70%);pointer-events:none;}
+.hero{text-align:center;max-width:640px;position:relative;z-index:1;}
+.brand-icon{width:76px;height:76px;margin:0 auto 24px;background:linear-gradient(135deg,var(--v),var(--vl));border-radius:20px;display:grid;place-items:center;font-size:34px;box-shadow:0 0 48px rgba(124,58,237,.4);}
+h1{font-family:'Orbitron',sans-serif;font-size:clamp(28px,6vw,52px);font-weight:900;letter-spacing:2px;margin-bottom:14px;background:linear-gradient(135deg,#fff 20%,var(--vl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sub{font-size:clamp(13px,2vw,16px);color:var(--dim);line-height:1.7;margin-bottom:32px;max-width:460px;margin-left:auto;margin-right:auto;}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:44px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;text-decoration:none;transition:all .18s;}
+.btn-v{background:linear-gradient(135deg,var(--v),var(--vl));color:#fff;box-shadow:0 8px 24px rgba(124,58,237,.38);}
+.btn-v:hover{transform:translateY(-2px);opacity:.9;}
+.btn-ghost{background:var(--card);color:var(--dim);border:1px solid var(--rim);}
+.btn-ghost:hover{border-color:var(--vl);color:var(--vl);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:10px;width:100%;max-width:640px;margin-bottom:44px;}
+.feat{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:16px;transition:border-color .18s;}
+.feat:hover{border-color:rgba(167,139,250,.35);}
+.feat .fi{font-size:24px;margin-bottom:8px;}
+.feat h3{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.8px;font-weight:700;margin-bottom:4px;}
+.feat p{font-size:11px;color:var(--dim);}
+.links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.links a{color:var(--vl);text-decoration:none;font-size:13px;}
+.links a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="brand-icon">▶</div>
+  <h1>𝙵𝚒𝚕𝚎𝚃𝚘𝙻𝚒𝚗𝚔𝚅𝟹</h1>
+  <p class="sub">Upload files to our Telegram bot and get instant, permanent streaming &amp; download links. No expiry. No ads.</p>
+  <div class="cta-row">
+    <a class="btn btn-v"     href="https://t.me/{{ bot_username }}" target="_blank">🤖 Open on Telegram</a>
+    <a class="btn btn-ghost" href="{{ updates }}"                   target="_blank">📢 Updates</a>
+  </div>
+  <div class="grid">
+    <div class="feat"><div class="fi">🎬</div><h3>STREAM VIDEO</h3><p>Watch in browser instantly</p></div>
+    <div class="feat"><div class="fi">🎵</div><h3>STREAM AUDIO</h3><p>Listen without downloading</p></div>
+    <div class="feat"><div class="fi">📁</div><h3>ALL FILES</h3><p>Any format supported</p></div>
+    <div class="feat"><div class="fi">🔒</div><h3>SECURE DL</h3><p>HMAC-protected links</p></div>
+    <div class="feat"><div class="fi">♾️</div><h3>PERMANENT</h3><p>Links never expire</p></div>
+    <div class="feat"><div class="fi">💎</div><h3>PREMIUM</h3><p>Higher limits & priority</p></div>
+  </div>
+  <div class="links">
+    <a href="{{ updates }}" target="_blank">📢 Updates Channel</a>
+    <a href="{{ support }}" target="_blank">💬 Support Group</a>
+    <a href="{{ dev }}"     target="_blank">👨‍💻 Developer</a>
+  </div>
+</div>
+</body>
+</html>

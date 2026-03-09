@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>{{ file.file_name }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#06060c;--panel:#0e0e16;--card:#14141e;--rim:rgba(255,255,255,.07);
+  --v:#7c3aed;--vl:#a78bfa;--teal:#0ea5e9;--ink:#e8e8f4;--dim:#7070a0;--r:12px;
+}
+html,body{height:100%;background:var(--bg);}
+body{font-family:'Space Grotesk',sans-serif;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+body::before{
+  content:'';position:fixed;top:-25vh;left:50%;transform:translateX(-50%);
+  width:80vw;height:60vh;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse,rgba(124,58,237,.13) 0%,transparent 68%);
+}
+.topbar{
+  position:sticky;top:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;background:rgba(6,6,12,.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--rim);
+}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);}
+.logo-sq{
+  width:30px;height:30px;border-radius:7px;
+  background:linear-gradient(135deg,var(--v),var(--vl));
+  display:grid;place-items:center;font-size:13px;
+  box-shadow:0 0 12px rgba(167,139,250,.4);
+}
+.logo-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;}
+.topbar-nav{display:flex;gap:4px;}
+.tnav{padding:4px 10px;border-radius:16px;font-size:11px;font-weight:500;text-decoration:none;color:var(--dim);border:1px solid transparent;transition:all .15s;}
+.tnav:hover{color:var(--ink);background:var(--card);border-color:var(--rim);}
+.page{flex:1;width:100%;max-width:1080px;margin:0 auto;padding:18px 16px 48px;position:relative;z-index:1;}
+.shell{background:var(--panel);border:1px solid var(--rim);border-radius:14px;overflow:hidden;box-shadow:0 28px 72px rgba(0,0,0,.7);}
+
+/* ── Plyr theme ── */
+.plyr{
+  --plyr-color-main:var(--v);--plyr-range-fill-background:var(--vl);
+  --plyr-video-background:#000;--plyr-font-family:'Space Grotesk',sans-serif;
+  --plyr-font-size-base:13px;--plyr-control-icon-size:17px;--plyr-control-spacing:9px;
+  --plyr-menu-background:var(--card);--plyr-menu-color:var(--ink);
+  --plyr-tooltip-background:rgba(14,14,22,.95);--plyr-tooltip-color:var(--ink);
+  --plyr-badge-background:var(--v);width:100%;border-radius:0;
+}
+.plyr--video{background:#000;}
+.plyr__control--overlaid{background:rgba(124,58,237,.88)!important;width:56px!important;height:56px!important;border-radius:50%!important;}
+.plyr__control--overlaid svg{width:22px!important;height:22px!important;}
+.plyr__control--overlaid:hover{background:var(--vl)!important;transform:scale(1.08);}
+.plyr--full-ui input[type=range]::-webkit-slider-thumb{background:var(--vl);}
+
+/* Fullscreen */
+:fullscreen .topbar,:fullscreen .info-row,:fullscreen .footer-bar,:fullscreen .mx-panel{display:none!important;}
+:-webkit-full-screen .topbar,:-webkit-full-screen .info-row,:-webkit-full-screen .footer-bar,:-webkit-full-screen .mx-panel{display:none!important;}
+:-moz-full-screen .topbar,:-moz-full-screen .info-row,:-moz-full-screen .footer-bar,:-moz-full-screen .mx-panel{display:none!important;}
+body.plyr-fs .topbar,body.plyr-fs .info-row,body.plyr-fs .footer-bar,body.plyr-fs .mx-panel{display:none!important;}
+
+/* ── MX-Player style panel ── */
+.mx-panel{
+  background:var(--card);border-bottom:1px solid var(--rim);
+  padding:0;overflow:hidden;
+}
+.mx-tabs{
+  display:flex;border-bottom:1px solid var(--rim);
+}
+.mx-tab{
+  flex:1;padding:9px 12px;font-size:11px;font-weight:700;text-align:center;
+  cursor:pointer;color:var(--dim);letter-spacing:.5px;transition:all .15s;
+  border-bottom:2px solid transparent;
+}
+.mx-tab.active{color:var(--vl);border-bottom-color:var(--vl);}
+.mx-tab:hover:not(.active){color:var(--ink);}
+.mx-body{display:none;padding:10px 14px 12px;max-height:200px;overflow-y:auto;}
+.mx-body.active{display:block;}
+.mx-body::-webkit-scrollbar{width:4px;}
+.mx-body::-webkit-scrollbar-thumb{background:var(--v);border-radius:4px;}
+
+/* Track rows */
+.track-list{display:flex;flex-wrap:wrap;gap:6px;}
+.track-btn{
+  padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;
+  border:1px solid var(--rim);background:rgba(255,255,255,.04);color:var(--dim);
+  cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif;
+}
+.track-btn:hover{color:var(--ink);border-color:var(--vl);}
+.track-btn.active{background:rgba(124,58,237,.2);border-color:var(--vl);color:var(--vl);}
+.track-btn .badge{
+  display:inline-block;margin-left:5px;padding:1px 5px;border-radius:8px;
+  font-size:9px;background:var(--v);color:#fff;vertical-align:middle;
+}
+.no-tracks{color:var(--dim);font-size:12px;padding:4px 0;}
+
+/* Quality select */
+.qual-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.qual-info{font-size:11px;color:var(--dim);margin-top:6px;flex-basis:100%;}
+
+/* ── Audio vis ── */
+.audio-vis{
+  aspect-ratio:21/5;background:linear-gradient(135deg,#08081a,#18083a,#060e1a);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;position:relative;overflow:hidden;
+}
+.audio-vis::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 38px,rgba(124,58,237,.04) 38px 39px);}
+.vis-bars{display:flex;gap:3px;align-items:flex-end;height:44px;position:relative;z-index:1;}
+.vis-bars span{display:block;width:3px;border-radius:3px;background:var(--vl);opacity:.65;animation:vb 1.1s ease-in-out infinite alternate;}
+.vis-bars span:nth-child(2n){animation-delay:-.17s;}
+.vis-bars span:nth-child(3n){animation-delay:-.34s;}
+.vis-bars span:nth-child(4n){animation-delay:-.51s;}
+.vis-bars span:nth-child(5n){animation-delay:-.68s;}
+@keyframes vb{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+.audio-label{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:var(--vl);opacity:.6;position:relative;z-index:1;}
+
+/* HEVC */
+.hevc-warn{display:flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);font-size:12px;color:#fbbf24;}
+.hevc-warn a{color:#f59e0b;}
+
+/* Info row */
+.info-row{padding:14px 18px;border-top:1px solid var(--rim);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.fname{font-size:14px;font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px;}
+.tags{display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex-shrink:0;}
+.tag{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600;background:rgba(255,255,255,.05);border:1px solid var(--rim);color:var(--dim);white-space:nowrap;}
+.tag.v{background:rgba(124,58,237,.15);border-color:rgba(167,139,250,.3);color:#c4b5fd;}
+.tag.g{background:rgba(16,185,129,.08);border-color:rgba(52,211,153,.25);color:#6ee7b7;}
+.tag.b{background:rgba(14,165,233,.08);border-color:rgba(56,189,248,.25);color:#7dd3fc;}
+
+/* Action bar */
+.action-bar{padding:10px 18px 16px;border-top:1px solid var(--rim);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;text-decoration:none;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--dim);border:1px solid var(--rim);}
+.btn-ghost:hover{background:rgba(255,255,255,.09);color:var(--ink);border-color:rgba(255,255,255,.14);}
+.btn-v{background:var(--v);color:#fff;box-shadow:0 3px 10px rgba(124,58,237,.4);}
+.btn-v:hover{background:var(--vl);transform:translateY(-1px);}
+.share-pill{display:flex;align-items:center;gap:6px;flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--rim);border-radius:8px;padding:6px 10px;overflow:hidden;}
+.share-pill span{flex:1;font-size:11px;color:var(--dim);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cpbtn{flex-shrink:0;background:var(--card);border:1px solid var(--rim);color:var(--ink);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;}
+.cpbtn:hover{border-color:var(--vl);color:var(--vl);}
+
+/* Footer */
+.footer-bar{text-align:center;padding:12px 16px 24px;font-size:11px;color:var(--dim);letter-spacing:.3px;position:relative;z-index:1;}
+.footer-bar a{color:var(--vl);text-decoration:none;}
+.footer-bar a:hover{text-decoration:underline;}
+.flinks{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:4px;}
+
+/* Toast */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--v);color:#fff;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:all .2s;z-index:9999;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:540px){
+  .topbar-nav .tnav:not(:last-child){display:none;}
+  .fname{max-width:200px;font-size:12px;}
+  .action-bar{flex-direction:column;align-items:stretch;}
+  .share-pill{min-width:0;}
+  .mx-tabs{font-size:10px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar" id="topbar">
+  <a class="logo" href="/"><div class="logo-sq">▶</div><span class="logo-name">𝙵𝚒𝚕𝚎𝚃𝚘𝙻𝚒𝚗𝚔𝚅𝟹</span></a>
+  <div class="topbar-nav">
+    <a class="tnav" href="{{ updates }}" target="_blank">📢 Updates</a>
+    <a class="tnav" href="{{ support }}" target="_blank">💬 Support</a>
+    <a class="tnav" href="{{ dev }}"     target="_blank">👨‍💻 Dev</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="shell" id="shell">
+
+    {% if file.file_type == 'audio' %}
+      <div class="audio-vis">
+        <div class="vis-bars">
+          {% for h in [18,55,32,80,22,68,42,58,28,72,38,62,20,82,34,52,24,70,38,58] %}
+          <span style="height:{{ h }}%"></span>
+          {% endfor %}
+        </div>
+        <div class="audio-label">𝙽𝙾𝚆 𝙿𝙻𝙰𝚈𝙸𝙽𝙶</div>
+      </div>
+      <audio id="media" controls preload="metadata" style="width:100%">
+        <source src="{{ stream_url }}"/>
+      </audio>
+
+    {% else %}
+      {% if may_be_hevc %}
+      <div class="hevc-warn" id="hevcWarn">
+        ⚠️ <strong>MKV/AVI ꜰɪʟᴇ ᴅᴇᴛᴇᴄᴛᴇᴅ.</strong>
+        ɪꜰ ᴠɪᴅᴇᴏ ꜱʜᴏᴡꜱ ʙʟᴀᴄᴋ ꜱᴄʀᴇᴇɴ, ᴛʜᴇ ꜰɪʟᴇ ᴜꜱᴇꜱ H.265/HEVC ᴄᴏᴅᴇᴄ ᴡʜɪᴄʜ ᴄʜʀᴏᴍᴇ/ꜰɪʀᴇꜰᴏx ᴄᴀɴ'ᴛ ᴘʟᴀʏ.
+        ᴛʀʏ <a href="{{ stream_url }}" download>ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ɪᴛ</a> ᴀɴᴅ ᴏᴘᴇɴɪɴɢ ɪɴ ᴠʟᴄ.
+        <button onclick="document.getElementById('hevcWarn').remove()" style="margin-left:auto;background:none;border:none;color:#fbbf24;cursor:pointer;font-size:14px;">✕</button>
+      </div>
+      {% endif %}
+
+      <video id="media" controls preload="metadata" playsinline crossorigin="anonymous">
+        <source src="{{ stream_url }}" type="video/mp4"/>
+      </video>
+    {% endif %}
+
+    <!-- codec error -->
+    <div id="codecError" style="display:none;padding:14px 18px;background:rgba(239,68,68,.08);border-top:1px solid rgba(239,68,68,.2);font-size:13px;color:#fca5a5;">
+      ❌ <strong>ᴘʟᴀʏʙᴀᴄᴋ ꜰᴀɪʟᴇᴅ.</strong> ᴛʜɪꜱ ꜰɪʟᴇ ᴜꜱᴇꜱ H.265/HEVC — ɴᴏᴛ ꜱᴜᴘᴘᴏʀᴛᴇᴅ ɪɴ ᴍᴏꜱᴛ ʙʀᴏᴡꜱᴇʀꜱ.
+      <a href="{{ stream_url }}" download style="color:#f87171;">ᴅᴏᴡɴʟᴏᴀᴅ ɪᴛ</a> ᴀɴᴅ ᴘʟᴀʏ ɪɴ ᴠʟᴄ ᴏʀ ᴍx ᴘʟᴀʏᴇʀ.
+    </div>
+
+    <!-- ══════════════ MX-PLAYER STYLE PANEL ══════════════ -->
+    <div class="mx-panel" id="mxPanel">
+      <div class="mx-tabs">
+        <div class="mx-tab active" data-tab="audio" onclick="switchTab('audio')">🎵 𝙰𝚄𝙳𝙸𝙾 𝚃𝚁𝙰𝙲𝙺𝚂</div>
+        <div class="mx-tab"        data-tab="sub"   onclick="switchTab('sub')">📝 𝚂𝚄𝙱𝚃𝙸𝚃𝙻𝙴𝚂</div>
+        <div class="mx-tab"        data-tab="qual"  onclick="switchTab('qual')">📺 𝚀𝚄𝙰𝙻𝙸𝚃𝚈</div>
+      </div>
+
+      <!-- Audio tracks -->
+      <div class="mx-body active" id="tab-audio">
+        <div class="track-list" id="audioTrackList">
+          <span class="no-tracks">ᴅᴇᴛᴇᴄᴛɪɴɢ ᴀᴜᴅɪᴏ ᴛʀᴀᴄᴋꜱ…</span>
+        </div>
+      </div>
+
+      <!-- Subtitles -->
+      <div class="mx-body" id="tab-sub">
+        <div class="track-list" id="subTrackList">
+          <span class="no-tracks">ᴅᴇᴛᴇᴄᴛɪɴɢ ꜱᴜʙᴛɪᴛʟᴇ ᴛʀᴀᴄᴋꜱ…</span>
+        </div>
+      </div>
+
+      <!-- Quality -->
+      <div class="mx-body" id="tab-qual">
+        <div class="qual-row" id="qualList">
+          <span class="no-tracks">ᴅᴇᴛᴇᴄᴛɪɴɢ ᴠɪᴅᴇᴏ Qᴜᴀʟɪᴛʏ…</span>
+        </div>
+        <div class="qual-info" id="qualInfo"></div>
+      </div>
+    </div>
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- Info row -->
+    <div class="info-row" id="infoRow">
+      <div class="fname" title="{{ file.file_name }}">{{ file.file_name }}</div>
+      <div class="tags">
+        <span class="tag v">
+          {% if file.file_type=='video' %}🎬{% elif file.file_type=='audio' %}🎵{% else %}📄{% endif %}
+          {{ file.file_type | capitalize }}
+        </span>
+        <span class="tag g">{{ file_size }}</span>
+        {% if file.mime_type %}
+        <span class="tag b">{{ file.mime_type.split('/')[-1] | upper }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar" id="actionBar">
+      <div class="share-pill">
+        <span id="surl">{{ request.url }}</span>
+        <button class="cpbtn" onclick="cp()">Copy</button>
+      </div>
+      <button class="btn btn-ghost" onclick="cp()">🔗 ꜱʜᴀʀᴇ</button>
+      <a class="btn btn-ghost" href="{{ updates }}" target="_blank">📢</a>
+      <a class="btn btn-ghost" href="{{ support }}" target="_blank">💬</a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer-bar" id="footerBar">
+  <div class="flinks">
+    <a href="{{ updates }}" target="_blank">📢 𝚄𝚙𝚍𝚊𝚝𝚎𝚜</a>
+    <a href="{{ support }}" target="_blank">💬 𝚂𝚞𝚙𝚙𝚘𝚛𝚝</a>
+    <a href="{{ dev }}"     target="_blank">👨‍💻 𝙳𝚎𝚟𝚎𝚕𝚘𝚙𝚎𝚛</a>
+  </div>
+  ᴘᴏᴡᴇʀᴇᴅ ʙʏ <strong>𝙵𝚒𝚕𝚎𝚃𝚘𝙻𝚒𝚗𝚔𝚅𝟹</strong>
+</footer>
+
+<div class="toast" id="toast">✅ Copied!</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  Plyr Init
+// ═══════════════════════════════════════════════════════════
+const player = new Plyr('#media', {
+  controls: ['play-large','rewind','play','fast-forward','progress','current-time','duration','mute','volume','captions','settings','pip','fullscreen'],
+  settings: ['captions','speed','loop'],
+  speed:    { selected:1, options:[0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5] },
+  keyboard: { focused:true, global:true },
+  tooltips: { controls:true, seek:true },
+  captions: { active:true, update:true },
+  resetOnEnd: false,
+  urls: { download: null },
+});
+
+player.on('ready', () => {
+  document.querySelectorAll('[data-plyr="download"]').forEach(el => el.remove());
+  detectTracks();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  Tab switching
+// ═══════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.mx-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.mx-body').forEach(b => b.classList.toggle('active', b.id === 'tab-'+name));
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Track & Quality Detection
+// ═══════════════════════════════════════════════════════════
+const mediaEl = document.getElementById('media');
+
+function detectTracks() {
+  if (!mediaEl) return;
+  detectAudioTracks();
+  detectSubtitles();
+  detectQuality();
+}
+
+// ── Audio Tracks ──────────────────────────────────────────
+function detectAudioTracks() {
+  const list = document.getElementById('audioTrackList');
+  const tracks = mediaEl.audioTracks;  // AudioTrackList (Chrome/Edge)
+
+  if (tracks && tracks.length > 0) {
+    list.innerHTML = '';
+    for (let i = 0; i < tracks.length; i++) {
+      const t = tracks[i];
+      const lang  = t.language || ('ᴛʀᴀᴄᴋ ' + (i+1));
+      const label = t.label    || lang;
+      const btn   = makeTrackBtn(label, t.enabled, () => {
+        for (let j = 0; j < tracks.length; j++) tracks[j].enabled = (j === i);
+        list.querySelectorAll('.track-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+      });
+      if (t.enabled) btn.classList.add('active');
+      list.appendChild(btn);
+    }
+  } else {
+    // Fallback: try WebAudio AudioContext channel detection or just show default
+    list.innerHTML = '';
+    const def = makeTrackBtn('🔊 Default Audio', true, ()=>{});
+    def.classList.add('active');
+    list.appendChild(def);
+    // Try to detect extra audio tracks via fetch HEAD and custom server info
+    tryFetchAudioInfo(list);
+  }
+}
+
+async function tryFetchAudioInfo(list) {
+  // If server returns X-Audio-Tracks header in the stream response
+  try {
+    const r = await fetch('{{ stream_url }}', {method:'HEAD'});
+    const hdr = r.headers.get('X-Audio-Tracks');
+    if (hdr) {
+      const tracks = JSON.parse(hdr);
+      if (tracks.length > 1) {
+        list.innerHTML = '';
+        tracks.forEach((t, i) => {
+          const btn = makeTrackBtn(t.label || ('ᴛʀᴀᴄᴋ ' + (i+1)), i===0, () => {
+            list.querySelectorAll('.track-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+          });
+          if (i===0) btn.classList.add('active');
+          list.appendChild(btn);
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+// ── Subtitles ─────────────────────────────────────────────
+function detectSubtitles() {
+  const list  = document.getElementById('subTrackList');
+  const tracks = mediaEl.textTracks;
+  list.innerHTML = '';
+
+  // "Off" button always first
+  const offBtn = makeTrackBtn('🚫 ᴏꜰꜰ', true, () => {
+    for (let i = 0; i < tracks.length; i++) tracks[i].mode = 'disabled';
+    list.querySelectorAll('.track-btn').forEach((b,j) => b.classList.toggle('active', j===0));
+  });
+  offBtn.classList.add('active');
+  list.appendChild(offBtn);
+
+  let found = 0;
+  for (let i = 0; i < tracks.length; i++) {
+    const t = tracks[i];
+    if (t.kind !== 'subtitles' && t.kind !== 'captions') continue;
+    found++;
+    const lang  = t.language || ('ʟᴀɴɢ ' + (i+1));
+    const label = t.label    || lang;
+    const btn   = makeTrackBtn('📝 ' + label, false, () => {
+      for (let j = 0; j < tracks.length; j++) tracks[j].mode = 'disabled';
+      t.mode = 'showing';
+      list.querySelectorAll('.track-btn').forEach((b,j) => b.classList.toggle('active', j===(i+1)));
+    });
+    list.appendChild(btn);
+  }
+
+  if (found === 0) {
+    const info = document.createElement('span');
+    info.className = 'no-tracks';
+    info.textContent = 'ɴᴏ ꜱᴜʙᴛɪᴛʟᴇꜱ ꜰᴏᴜɴᴅ ɪɴ ᴛʜɪꜱ ꜰɪʟᴇ.';
+    list.appendChild(info);
+  }
+}
+
+// ── Quality ───────────────────────────────────────────────
+function detectQuality() {
+  const list   = document.getElementById('qualList');
+  const info   = document.getElementById('qualInfo');
+  const vw     = mediaEl.videoWidth;
+  const vh     = mediaEl.videoHeight;
+
+  list.innerHTML = '';
+  info.textContent = '';
+
+  // Quality labels based on native resolution
+  const qualities = buildQualityLevels(vw, vh);
+  if (qualities.length === 0) {
+    list.innerHTML = '<span class="no-tracks">ᴅᴇᴛᴇᴄᴛɪɴɢ Qᴜᴀʟɪᴛʏ…</span>';
+    // Retry after video loads
+    mediaEl.addEventListener('loadedmetadata', () => detectQuality(), { once: true });
+    return;
+  }
+
+  qualities.forEach((q, i) => {
+    const btn = makeTrackBtn(q.label, i === 0, () => {
+      list.querySelectorAll('.track-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+      applyQuality(q);
+    });
+    if (i === 0) btn.classList.add('active');
+    if (q.native) btn.innerHTML += '<span class="badge">NATIVE</span>';
+    list.appendChild(btn);
+  });
+
+  if (vw && vh) {
+    info.textContent = `ɴᴀᴛɪᴠᴇ ʀᴇꜱᴏʟᴜᴛɪᴏɴ: ${vw}×${vh}`;
+  }
+}
+
+function buildQualityLevels(vw, vh) {
+  const levels = [];
+  if (!vw || !vh) {
+    // Unknown — offer generic levels
+    return [
+      { label:'🔵 Auto (Best)', native:true  },
+      { label:'🟢 720p HD',     native:false },
+      { label:'🟡 480p SD',     native:false },
+      { label:'🔴 360p Low',    native:false },
+    ];
+  }
+
+  const maxDim = Math.max(vw, vh);
+
+  // Always show Auto first
+  levels.push({ label:'🔵 Auto (Best)', native:true, vw, vh });
+
+  if (maxDim >= 2160) levels.push({ label:'🟣 2160p 4K',  native:maxDim>=2160 });
+  if (maxDim >= 1440) levels.push({ label:'🔵 1440p 2K',  native:maxDim>=1440&&maxDim<2160 });
+  if (maxDim >= 1080) levels.push({ label:'🟢 1080p FHD', native:maxDim>=1080&&maxDim<1440 });
+  if (maxDim >= 720)  levels.push({ label:'🟢 720p HD',   native:maxDim>=720&&maxDim<1080 });
+  if (maxDim >= 480)  levels.push({ label:'🟡 480p SD',   native:maxDim>=480&&maxDim<720 });
+                      levels.push({ label:'🔴 360p Low',  native:maxDim<480 });
+
+  // Mark the first matching resolution as native
+  levels.forEach((l,i) => { if (i>0 && l.native) l.label += ' ★'; });
+
+  return levels;
+}
+
+function applyQuality(q) {
+  // For a single-source stream we can't truly transcode on the fly in the browser,
+  // but we show a toast informing the user. For HLS/DASH sources this would set the quality level.
+  showToast('📺 ' + q.label + ' — ꜱᴛʀᴇᴀᴍɪɴɢ ᴀᴛ ɴᴀᴛɪᴠᴇ Qᴜᴀʟɪᴛʏ');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Helper: make a track button
+// ═══════════════════════════════════════════════════════════
+function makeTrackBtn(label, active, onClick) {
+  const btn = document.createElement('button');
+  btn.className = 'track-btn' + (active ? ' active' : '');
+  btn.textContent = label;
+  btn.addEventListener('click', onClick);
+  return btn;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Fullscreen: hide page chrome
+// ═══════════════════════════════════════════════════════════
+const HIDE_IDS = ['topbar','infoRow','actionBar','footerBar','hevcWarn','mxPanel'];
+
+function hideChrome() {
+  HIDE_IDS.forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+  document.body.classList.add('plyr-fs');
+}
+function showChrome() {
+  HIDE_IDS.forEach(id => { const el=document.getElementById(id); if(el) el.style.display=''; });
+  document.body.classList.remove('plyr-fs');
+}
+
+player.on('enterfullscreen', hideChrome);
+player.on('exitfullscreen',  showChrome);
+document.addEventListener('fullscreenchange',       () => { if(!document.fullscreenElement)       showChrome(); });
+document.addEventListener('webkitfullscreenchange', () => { if(!document.webkitFullscreenElement) showChrome(); });
+
+// ═══════════════════════════════════════════════════════════
+//  Codec error detection (H.265 black screen)
+// ═══════════════════════════════════════════════════════════
+if (mediaEl) {
+  mediaEl.addEventListener('error', () => {
+    document.getElementById('codecError').style.display = 'block';
+  }, true);
+
+  let playStarted = false;
+  mediaEl.addEventListener('play', () => { playStarted = true; });
+  player.on('playing', () => {
+    setTimeout(() => {
+      if (mediaEl.tagName==='VIDEO' && playStarted && mediaEl.videoWidth===0 && mediaEl.currentTime>1) {
+        document.getElementById('codecError').style.display = 'block';
+      }
+      // After video starts, refresh tracks
+      detectSubtitles();
+    }, 3000);
+  });
+
+  // Detect on loadedmetadata too
+  mediaEl.addEventListener('loadedmetadata', () => {
+    detectAudioTracks();
+    detectSubtitles();
+    detectQuality();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Resume playback position
+// ═══════════════════════════════════════════════════════════
+const POS_KEY = 'sbpos_' + location.pathname;
+player.on('loadedmetadata', () => {
+  const saved = parseFloat(sessionStorage.getItem(POS_KEY) || 0);
+  if (saved > 4 && saved < player.duration - 5) player.currentTime = saved;
+});
+player.on('timeupdate', () => {
+  if (player.currentTime > 0) sessionStorage.setItem(POS_KEY, player.currentTime);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  Copy & Toast
+// ═══════════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2500);
+}
+
+function cp() {
+  navigator.clipboard.writeText(document.getElementById('surl').textContent.trim())
+    .then(() => showToast('✅ ʟɪɴᴋ ᴄᴏᴘɪᴇᴅ!'));
+}
+</script>
+</body>
+</html>
